@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./main.css">
+    <title>Squish velocity calculator</title>
+</head>
+
+<body class="bg-light">
+    <div class="container">
+        <div class="py-2 text-center">
+            <h2 class="mb-2">Squish velocity calculator</h2>
+            <p class="headerp">Input numerical values for engine parameters. Non-negative squish angles only. </p>
+        </div>
+
+        <hr class="mb-4">
+
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="mb-2">Calculation input</h3>
+                <form class="needs-validation" novalidate>
+                    <h6 class="mb-2">Fixed engine dimensions</h6>
+                    <div class="row mb-4">
+                        <div class="col-sm-4 mb-3">
+                            <label for="bore">Cylinder bore</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="bore" placeholder="" value="" min="0" required step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">mm</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid cylinder bore is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <label for="stroke">Engine stroke</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="stroke" placeholder="" value="" min="0" required step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">mm</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid stroke length is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <label for="conrod">Conrod length</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="conrod" placeholder="" value="" min="0" required step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">mm</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid conrod length is required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-2">Variable engine dimensions</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <label for="rpm">RPM</label>
+                            <input type="number" class="form-control" id="rpm" placeholder="" value="" min="0" required>
+                            <div class="invalid-feedback">
+                                Valid RPM is required.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="exhtiming">Exhaust port timing</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="exhtiming" placeholder="" value="" min="0" required step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">&deg; ATDC</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid exhaust port timing is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="compratio">Compression ratio</label>
+                            <input type="number" class="form-control" id="compratio" placeholder="" value="" min="1" required step="0.01">
+                            <div class="invalid-feedback">
+                                Valid compression ratio is required.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-2">Cylinder head dimensions</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-2">
+                            <label for="sqarearatio">Squish ratio</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="sqarearatio" placeholder="" value="" required min="0" max="100" step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid squish ratio is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="sqangle">Squish angle</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="sqangle" placeholder="" value="" min="0" required step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">&deg;</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid squish angle is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="sqclear">Squish clearance</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="sqclear" placeholder="" value="" min="0" required step="0.01">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">mm</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Valid squish clearance is required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+                    <div>
+                        <button id="openbtn" class="btn btn-success" type="button">Open engine data</button>
+                        <button id="savebtn" class="btn btn-danger" type="button">Save engine data</button>
+                        <button class="btn btn-dark" type="submit">Calculate</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h3 class="mb-4">Results</h3>
+                <div class="chart-container mb-5" style="position: relative; height:50%; min-height: 200px;">
+                    <canvas id="resultChart"></canvas>
+                </div>
+                <p id="resultP" class="resultP">
+                    Maximum squish velocity:
+                    <span id="msv" class="font-weight-bold"></span>
+                    <span class="font-weight-bold">m/s</span>, occurred at
+                    <span id="maxdeg" class="font-weight-bold"></span>
+                    <span class="font-weight-bold">&deg; BTDC</span>
+                    <br /> Maximum squish pressure ratio:
+                    <span class="font-weight-bold" id="maxp"></span>
+                    </span>
+                    <br /> Total kinetic energy squished:
+                    <span class="font-weight-bold" id="totalke"></span>
+                    <span class="font-weight-bold">mJ</span>
+                </p>
+            </div>
+        </div>
+
+        <footer class="pt-5 text-muted text-center text-small">
+            <p class="mb-1">&copy; 2018 Elmeri Laakkonen</p>
+        </footer>
+    </div>
+
+    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./node_modules/chart.js/dist/Chart.min.js"></script>
+
+    <script>
+        document.addEventListener('dragover', event => event.preventDefault())
+        document.addEventListener('drop', event => event.preventDefault())
+        const electron = require('electron');
+        const { ipcRenderer } = electron;
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', submitForm);
+
+        function getFormData() {
+            formData = [];
+            if (form.checkValidity()) {
+                // Form is valid
+                const bore = document.querySelector('#bore').value;
+                const stroke = document.querySelector('#stroke').value;
+                const conrod = document.querySelector('#conrod').value;
+                const rpm = document.querySelector('#rpm').value;
+                const exhtiming = document.querySelector('#exhtiming').value;
+                const compratio = document.querySelector('#compratio').value;
+                const sqarearatio = document.querySelector('#sqarearatio').value;
+                const sqangle = document.querySelector('#sqangle').value;
+                const sqclear = document.querySelector('#sqclear').value;
+
+                formData = [bore, stroke, conrod, rpm, exhtiming, compratio, sqarearatio, sqangle, sqclear];
+            }
+            return formData;
+        }
+
+        function submitForm(e) {
+            e.preventDefault();
+
+            formData = getFormData();
+            if (formData.length != 0) {
+                ipcRenderer.send('formData', formData);
+            }
+
+            form.classList.add('was-validated');
+        }
+
+        var ctx = document.getElementById("resultChart");
+        ctx.style.height = '50%';
+
+        var openbtn = document.getElementById("openbtn");
+        openbtn.addEventListener('click', function () {
+            ipcRenderer.send('openData');
+        });
+
+        var savebtn = document.getElementById("savebtn");
+        savebtn.addEventListener('click', function () {
+            formData = getFormData();
+            if (formData.length != 0) {
+                ipcRenderer.send('saveData', formData);
+            }
+        });
+
+        ipcRenderer.on('wantToSave', function (e) {
+            formData = getFormData();
+            if (formData.length != 0) {
+                ipcRenderer.send('saveData', formData);
+            } else {
+                ipcRenderer.send('cantSave');
+            }
+        });
+
+        ipcRenderer.on('dataIncoming', function (e, data) {
+            document.getElementById("bore").value = data[0];
+            document.getElementById("stroke").value = data[1];
+            document.getElementById("conrod").value = data[2];
+            document.getElementById("rpm").value = data[3];
+            document.getElementById("exhtiming").value = data[4];
+            document.getElementById("compratio").value = data[5];
+            document.getElementById("sqarearatio").value = data[6];
+            document.getElementById("sqangle").value = data[7];
+            document.getElementById("sqclear").value = data[8];
+        })
+
+
+        ipcRenderer.on('calculatedData', function (e, calculatedData) {
+            //calculatedData = max_sq_v, max_crank_angle, sq_v_array, crank_angle_array, p_max, energy_array
+
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: calculatedData[3],
+                    datasets: [{
+                        label: 'Squish velocity',
+                        data: calculatedData[2],
+                        borderColor: 'rgba(255,99,132,1)',
+                        fill: false,
+                        yAxisID: 'y-axis-1'
+                    },
+                    {
+                        label: 'Kinetic energy',
+                        data: calculatedData[5],
+                        yAxisID: 'y-axis-2',
+                        fill: false,
+                        borderColor: 'rgb(54, 162, 235)'
+                    }]
+                },
+                options: {
+                    elements: {
+                        point: {
+                            radius: 0,
+                            hitRadius: 0,
+                            hoverRadius: 0
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                min: Math.floor(calculatedData[3][0] / 10) * 10,
+                                max: 0,
+                                stepSize: 1,
+                                callback: function (label, index, labels) {
+                                    return Math.round(label);
+                                }
+                            }
+                        }],
+                        yAxes: [{
+                            type: 'linear',
+                            display: 'true',
+                            position: 'left',
+                            id: 'y-axis-1',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Squish velocity (m/s)'
+                            }
+                        }, {
+                            type: 'linear',
+                            display: 'true',
+                            position: 'right',
+                            id: 'y-axis-2',
+                            gridLines: {
+                                drawOnChartArea: false
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Kinetic energy (mJ)'
+                            }
+                        }
+                        ]
+                    },
+                    tooltips: {
+                        enabled: false
+                    },
+                    animation: {
+                        duration: 0
+                    },
+                    responsive: true
+                }
+            });
+
+            document.getElementById('msv').innerHTML = Math.round(calculatedData[0] * 100) / 100;
+            document.getElementById('maxdeg').innerHTML = Math.round(calculatedData[1] * 100) / 100;
+            document.getElementById('maxp').innerHTML = Math.round(calculatedData[4] * 10000) / 10000;
+
+            function add(total, num) {
+                return total + num;
+            }
+
+
+            document.getElementById('totalke').innerHTML = Math.round(calculatedData[5].reduce(add) * 100) / 100;
+
+            document.getElementById('resultP').style.display = 'block';
+
+        });
+
+    </script>
+</body>
+
+</html>
